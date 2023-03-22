@@ -1,4 +1,4 @@
-## Application Details
+## Detalhes da aplicação
 |               |
 | ------------- |
 |**Generation Date and Time**<br>Wed Nov 16 2022 17:53:42 GMT+0000 (Coordinated Universal Time)|
@@ -11,7 +11,7 @@
 |**UI5 Version**<br>1.102.1|
 
 
-## Pre-requisites:
+## Pré-requisitos:
 
 1. Active NodeJS LTS (Long Term Support) version and associated supported NPM version.  (See https://nodejs.org)
 
