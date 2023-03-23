@@ -166,8 +166,6 @@ sap.ui.define([
 
             getReadOpcoes: function () {
 
-                debugger;
-
                 // Item 1 - Chamada via URL
                 var sElement = "/Produtos";
 
