@@ -1,4 +1,4 @@
-<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:m="sap.m" xmlns="sap.uxap" xmlns:layout="sap.ui.layout" controllerName="br.com.gestao.fioriappadmin.controller.Detalhes" displayBlock="true">
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:m="sap.m" xmlns="sap.uxap" controllerName="br.com.gestao.fioriappadmin.controller.Detalhes" displayBlock="true">
     <ObjectPageLayout id="ObjectPageLayout" showTitleInHeaderContent="true" showEditHeaderButton="true" editHeaderButtonPress="handleEditBtnPress" upperCaseAnchorBar="false">
         
         <headerTitle>
@@ -97,7 +97,7 @@
                 <m:VBox id="_IDGenVBox6" class="sapUiSmallMarginEnd sapUiSmallMarginBotton">
                     <m:HBox id="ds68r">
                         <m:Label id="cas58da" text="{i18n>headerCreatedby}" class="sapUiSmallMarginEnd" />
-                        <m:Link id="linkHeadera" text="{Usercreate}" />
+                        <m:Link id="linkHeadera" text="{UserName}" />
                     </m:HBox>
                     <m:HBox id="dsd68">
                         <m:Label id="cas58sa" text="{i18n>headerCreatedon}" class="sapUiSmallMarginEnd" />

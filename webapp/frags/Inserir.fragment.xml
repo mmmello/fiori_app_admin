@@ -108,10 +108,22 @@
                     <DatePicker valueStateText="{i18n>sfCreatedon}" id="inputData0" value="{ path: 'MDL_Produto>/Createdat', type : 'sap.ui.model.type.Date', formatOptions : { source: { pattern: 'dd/MM/yyyy' }, pattern: 'dd/MM/yyyy' }, constraints : { minimum : '01/01/2022' } }" required="true" width="65%" />
                     
                     <!-- Propriedade Criado por -->
-                    <Label id="lblCreatedby" text="{i18n>sfCreatedby}" required="true" />
+                    <!--
+					Deste modo estava buscando os dados via requisição no controller.
+					Coloquei pra buscar os dados via carregamento de serviço direto no manifest e recuperei na view no exemplo abaixo.
+
+					<Label id="lblCreatedby" text="{i18n>sfCreatedby}" required="true" />
                     <Select id="selChangedby" width="65%" selectedKey="{MDL_Produto>/Usercreate}" items="{MDL_Users>/}">
                         <items>
-                            <core:ListItem id="_IDGenListItem5" key="{MDL_Users>Userid}" text="{MDL_Users>Firstname} {MDL_Users&gt;Lastname}" />
+                            <core:ListItem id="_IDGenListItem5" key="{MDL_Users>Userid}" text="{MDL_Users>Firstname} {MDL_Users>Lastname}" />
+                        </items>
+                    </Select>-->
+
+					<!-- Propriedade teste Criado por -->
+                    <Label id="teste" text="{i18n>sfCreatedby}" required="true" />
+                    <Select id="selChangedbyteste" width="65%" selectedKey="{MDL_Produto>/Usercreate}" items="{path: 'Users>/Usuarios'}">
+                        <items>
+                            <core:ListItem id="_IDGenListItem5teste" key="{Users>Userid}" text="{Users>Firstname} {Users>Lastname}" />
                         </items>
                     </Select>
                 </sap.ui.layout.form:content>

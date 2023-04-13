@@ -159,7 +159,7 @@ sap.ui.define([
                     oDialog.open();
 
                     // Chamada da função para carregar os usuários
-                    that.onGetUsuarios();
+                    //that.onGetUsuarios(); Não precisa mais pois optei por carrega-los no carregamento do serviço via manifest
                     that.getReadOpcoes();
                 });
             },
@@ -191,7 +191,7 @@ sap.ui.define([
                     success: function (oData, results) {
                         if (results.statusCode === 200) { // Sucesso do Get
 
-                        }                        
+                        }
                     },
 
                     error: function (e) {
@@ -203,7 +203,7 @@ sap.ui.define([
                 });
             },
 
-            onGetUsuarios: function () {
+            /*onGetUsuarios: function () {
 
                 var that = this;
                 var strEntity = "/sap/opu/odata/sap/ZSB_USERS_13";
@@ -224,7 +224,7 @@ sap.ui.define([
                         });
                     }
                 });
-            },
+            },*/
 
             onValueHelpSearch: function (oEvent) {
                 var sValue = oEvent.getParameter("value");
@@ -331,6 +331,10 @@ sap.ui.define([
                 // 4 - Criar o objeto model rederência do model default (ODataModel)
                 var oModelProduto = this.getView().getModel();
 
+                debugger;
+
+                return false;
+
                 MessageBox.confirm(
                     bundle.getText("insertDialogMsg"),
                     function (oAction) {
@@ -404,11 +408,12 @@ sap.ui.define([
                 var sText = oEvent.getParameter("suggestValue");
                 var aFilters = [];
 
-                if(sText){
+                if (sText) {
                     aFilters.push(new Filter("Lifnr", FilterOperator.Contains, sText));
                 }
 
                 oEvent.getSource().getBinding("suggestionItems").filter(aFilters)
-;            }
+                    ;
+            }
         });
     });

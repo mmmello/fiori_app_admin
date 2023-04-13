@@ -1,4 +1,4 @@
-<core:FragmentDefinition xmlns:m="sap.m" xmlns:core="sap.ui.core" xmlns:forms="sap.ui.layout.form" xmlns:l="sap.ui.layout">
+<core:FragmentDefinition xmlns:m="sap.m" xmlns:core="sap.ui.core">
 	<m:VBox id="vboxChangeInfo" class="sapUiSmallMargin">
 		<sap.ui.layout.form:SimpleForm xmlns:sap.ui.layout.form="sap.ui.layout.form" minWidth="1024" editable="true"
 			layout="ResponsiveGridLayout" maxContainerCols="2" labelSpanL="4" labelSpanM="4" emptySpanL="1" emptySpanM="1"
@@ -55,8 +55,8 @@
 							minimum: 5
 						}
 					}"
-					id="input011"
-				/>
+					id="input011"/>
+
 				<!-- Propriedade Status -->
 				<m:Label id="lblStatus" text="{i18n>sfStatus}" required="true" />
 				<m:Select id="selectStatus" width="65%"
@@ -111,11 +111,12 @@
 							minimum: '01/01/2022'
 						}
 					}" required="true" width="65%" />
+
 				<!-- Propriedade Criado por -->
 				<m:Label id="lblCreatedby" text="{i18n>sfCreatedby}" required="true" />
-				<m:Select id="selChangedby" width="65%" selectedKey="{MDL_Produto>/Usercreate}" items="{MDL_Users>/}" >
+				<m:Select id="selChangedby" width="65%" selectedKey="{MDL_Produto>/Usercreate}" items="{path: 'Users>/Usuarios'}">
 					<m:items>
-						<core:ListItem id="_IDGenListItem5" key="{MDL_Users>Userid}" text="{MDL_Users>Firstname} {MDL_Users&gt;Lastname}" />
+						<core:ListItem id="_IDGenListItem5teste" key="{Users>Userid}" text="{Users>Firstname} {Users>Lastname}" />
 					</m:items>
 				</m:Select>
 			</sap.ui.layout.form:content>
