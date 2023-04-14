@@ -302,8 +302,6 @@ sap.ui.define([
 
                 if (validator.validate(this.byId("dialogCadProd"))) {
                     this.onInsert();
-                } else {
-                    MessageBox.information("não validou");
                 }
             },
 
@@ -331,10 +329,6 @@ sap.ui.define([
                 // 4 - Criar o objeto model rederência do model default (ODataModel)
                 var oModelProduto = this.getView().getModel();
 
-                debugger;
-
-                return false;
-
                 MessageBox.confirm(
                     bundle.getText("insertDialogMsg"),
                     function (oAction) {
@@ -349,34 +343,34 @@ sap.ui.define([
 
                             that._oBusyDialog.open();
 
-                            setTimeout(function () {
-                                var oModelSend = new ODataModel(oModelProduto.sServiceUrl, true);
-                                oModelSend.create("Produtos", objNovo, null,
-                                    function (d, r) {
-                                        if (r.statusCode === 201) {
-                                            MessageToast.show(bundle.getText("insertDialogSuccess", [objNovo.Productid]), {
-                                                duration: 5000
-                                            });
-
-                                            // Fechando a janela de cadastro
-                                            that.dialogClose();
-
-                                            // Dando refresh no model
-                                            that.getView().getModel().refresh();
-
-                                            // Fechando o BusyDialog
-                                            that._oBusyDialog.close();
-                                        }
-                                    },
-                                    function (e) {
-                                        // Fechando o BusyDialog
-                                        that._oBusyDialog.close();
-                                        var oRet = JSON.parse(e.responde.body);
-                                        MessageToast.show(oRet.error.message.value, {
+                            var oModelSend = new ODataModel(oModelProduto.sServiceUrl, true);
+                            oModelSend.create("Produtos", objNovo, null,
+                                function (d, r) {
+                                    if (r.statusCode === 201) {
+                                        MessageToast.show(bundle.getText("insertDialogSuccess", [objNovo.Productid]), {
                                             duration: 5000
                                         });
+
+                                        // Fechando a janela de cadastro
+                                        that.dialogClose();
+
+                                        // Dando refresh no model
+                                        that.getView().getModel().refresh();
+
+                                        // Fechando o BusyDialog
+                                        that._oBusyDialog.close();
+                                    }
+                                },
+                                function (e) {
+                                    // Fechando o BusyDialog
+                                    that._oBusyDialog.close();
+                                    var oRet = JSON.parse(e.responde.body);
+                                    MessageToast.show(oRet.error.message.value, {
+                                        duration: 5000
                                     });
-                            }, 500);
+                                }
+                            );
+                            
                         }
                     }
                 );
@@ -412,8 +406,7 @@ sap.ui.define([
                     aFilters.push(new Filter("Lifnr", FilterOperator.Contains, sText));
                 }
 
-                oEvent.getSource().getBinding("suggestionItems").filter(aFilters)
-                    ;
+                oEvent.getSource().getBinding("suggestionItems").filter(aFilters);
             }
         });
     });

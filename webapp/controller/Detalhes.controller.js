@@ -3,12 +3,20 @@ sap.ui.define([
     "sap/ui/core/format/NumberFormat",
     "br/com/gestao/fioriappadmin/util/Formatter",
     "sap/ui/core/Fragment",
-    "sap/ui/model/json/JSONModel"
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageToast",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+    "br/com/gestao/fioriappadmin/util/Validator",
+    "sap/ui/core/ValueState",
+    "sap/ui/model/odata/ODataModel",
+    "sap/m/MessageBox",
+    "sap/m/BusyDialog"
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, NumberFormat, Formatter, Fragment, JSONModel) {
+    function (Controller, NumberFormat, Formatter, Fragment, JSONModel, MessageToast, Filter, FilterOperator, Validator, ValueState, ODataModel, MessageBox, BusyDialog) {
         "use strict";
 
         return Controller.extend("br.com.gestao.fioriappadmin.controller.Detalhes", {
@@ -16,6 +24,16 @@ sap.ui.define([
             objFormatter: Formatter,
 
             onInit: function () {
+
+                sap.ui.getCore().attachValidationError(function (oEvent) {
+                    oEvent.getParameter("element").setValueState(ValueState.Error);
+                });
+
+                sap.ui.getCore().attachValidationSuccess(function (oEvent) {
+                    oEvent.getParameter("element").setValueState(ValueState.Success);
+                });
+
+
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 
                 // Esse método é chamado toda vez que um route acontece nessa página
@@ -84,6 +102,8 @@ sap.ui.define([
 
             onBindingChange: function (oEvent) {
 
+                debugger;
+
                 var oView = this.getView();
                 var oElementBinding = oView.getElementBinding();
 
@@ -149,14 +169,18 @@ sap.ui.define([
             },
 
             onValida: function (oEvent) {
-                debugger;
+                var validator = new Validator();
+
+                if (validator.validate(this.byId("vboxChangeProduct"))) {
+                    this.onUpdate();
+                }
             },
 
             onDelete: function (oEvent) {
 
             },
 
-            handleCancelPress: function (oEvent) {
+            handleCancelPress: function () {
                 //var oModel = this.getView().getModel();
                 //oModel.refresh(true);
                 this._HabilitaEdicao(false);
@@ -165,13 +189,153 @@ sap.ui.define([
             handleEditPress: function (oEvent) {
                 this.criarModel();
 
-                this._oProduto.Price = [this._oProduto.Price, undefined];
-                this._oProduto.Createdat = this._oProduto.Createdat.toLocaleDateString();
-
                 var oModelProduto = this.getView().getModel("MDL_Produto");
                 oModelProduto.setData(this._oProduto);
 
                 this._HabilitaEdicao(true);
+            },
+
+            onCategoria: function (oEvent) {
+                this._oInput = oEvent.getSource().getId();
+                var oView = this.getView();
+
+                // Verifico se o objeto fragment existe. Se não crio e adiciono na View
+                if (!this._CategoriaSearchHelp) {
+                    this._CategoriaSearchHelp = Fragment.load({
+                        id: oView.getId(),
+                        name: "br.com.gestao.fioriappadmin.frags.SH_Categorias",
+                        controller: this
+                    }).then(function (oDialog) {
+                        oView.addDependent(oDialog);
+                        return oDialog;
+                    });
+                }
+
+                this._CategoriaSearchHelp.then(function (oDialog) {
+                    // Limpando o filtro na abertura do fragment de categorias
+                    oDialog.getBinding("items").filter([]);
+
+                    // Abertura do fragment
+                    oDialog.open();
+                });
+            },
+
+            getSupplier: function (oEvent) {
+                debugger;
+                this._oInput = oEvent.getSource().getId();
+                var oValue = oEvent.getSource().getValue();
+                var sElement = "/Fornecedores('" + oValue + "')";
+
+                var oModel = this.getView().getModel();
+                var oModelProduto = this.getView().getModel("MDL_Produto");
+                var oModelSend = new ODataModel(oModel.sServiceUrl, true);
+
+                oModelSend.read(sElement, {
+                    success: function (oData, results) {
+                        if (results.statusCode === 200) {
+                            oModelProduto.setProperty("/Supplierid", oData.Lifnr);
+                            oModelProduto.setProperty("/Suppliername", oData.Name1);
+                        }
+                    },
+                    error: function (e) {
+                        oModelProduto.setProperty("/Supplierid", "");
+                        oModelProduto.setProperty("/Suppliername", "");
+
+                        var oRet = JSON.parse(e.responde.body);
+                        MessageToast.show(oRet.error.message.value, {
+                            duration: 5000
+                        });
+                    }
+                });
+
+            },
+
+            onSuggest: function (oEvent) {
+                debugger;
+                var sText = oEvent.getParameter("suggestValue");
+                var aFilters = [];
+
+                if (sText) {
+                    aFilters.push(new Filter("Lifnr", FilterOperator.Contains, sText));
+                }
+
+                oEvent.getSource().getBinding("suggestionItems").filter(aFilters);
+            },
+
+            onUpdate: function () {
+
+                //  1 - Criando referência do Model
+                var oModel = this.getView().getModel("MDL_Produto");
+                var objUpdate = oModel.getData();
+                var sPath = this.getView().getElementBinding().getPath();
+
+                //  2 - Manipulando propriedades
+                
+                objUpdate.Price = objUpdate.Price.toString();
+                objUpdate.Weightmeasure = objUpdate.Weightmeasure.toString();
+                objUpdate.Width = objUpdate.Width.toString();
+                objUpdate.Depth = objUpdate.Depth.toString();
+                objUpdate.Height = objUpdate.Height.toString();
+                objUpdate.Changedat = new Date().toISOString().substring(0,19);
+
+                delete objUpdate.to_cat;
+                delete objUpdate.__metadata;
+
+                // 3 - Criando uma referência do arquivo i18n
+                var bundle = this.getView().getModel("i18n").getResourceBundle();
+                var that = this;
+
+                // 4 - Criar o objeto model rederência do model default (ODataModel)
+                var oModelProduto = this.getView().getModel();
+
+                MessageBox.confirm(
+                    bundle.getText("updateDialogMsg", [objUpdate.Productid]),
+                    function (oAction) {
+
+                        // Verificando se o usuário confirmou ou não a operação
+                        if (MessageBox.Action.OK === oAction) {
+
+                            // Criando um BusyDialog
+                            that._oBusyDialog = new BusyDialog({
+                                text: bundle.getText("Sending")
+                            });
+
+                            that._oBusyDialog.open();
+                        
+                            var oModelSend = new ODataModel(oModelProduto.sServiceUrl, true);
+                            oModelSend.update(sPath, objUpdate, null,
+                                function (d, r) {
+                                    if (r.statusCode === 204) {
+
+                                        // Fechando o BusyDialog
+                                        that._oBusyDialog.close();
+
+                                        // Voltar para somente leitura
+                                        that.handleCancelPress();
+
+                                        // Mensagem de sucesso na tela
+                                        MessageBox.success(
+                                            bundle.getText("updateDialogSuccess", [objUpdate.Productid]), {
+                                                onClose: function(sAction){
+                                                    // Atualizando a tela
+                                                    that.getView().getModel().refresh();
+                                                }
+                                            }
+                                        );
+                                    }
+                                },
+                                function (e) {
+                                    // Fechando o BusyDialog
+                                    that._oBusyDialog.close();
+                                    var oRet = JSON.parse(e.responde.body);
+                                    MessageToast.show(oRet.error.message.value, {
+                                        duration: 5000
+                                    });
+                                }
+                            );
+                        }
+                    }, bundle.getText("updateDialogTitle")
+                );
             }
         });
     });
