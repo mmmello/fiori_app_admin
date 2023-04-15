@@ -11,7 +11,8 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "br/com/gestao/fioriappadmin/util/Validator",
     "sap/m/BusyDialog",
-    "sap/ui/model/odata/ODataModel"
+    "sap/ui/model/odata/ODataModel",
+    "sap/ui/core/ListItem"
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
@@ -28,7 +29,8 @@ sap.ui.define([
         JSONModel,
         Validator,
         BusyDialog,
-        ODataModel) {
+        ODataModel,
+        ListItem) {
         "use strict";
 
         return Controller.extend("br.com.gestao.fioriappadmin.controller.Lista", {
@@ -50,8 +52,10 @@ sap.ui.define([
 
             criarModel: function () {
                 // Model produto
-                var oModel = new JSONModel();
-                this.getView().setModel(oModel, "MDL_Produto");
+                if(!this.getView().getModel("MDL_Produto")){
+                    var oModel = new JSONModel();
+                    this.getView().setModel(oModel, "MDL_Produto");
+                }
             },
 
             onSearch: function (oEvent) {
@@ -159,7 +163,7 @@ sap.ui.define([
                     oDialog.open();
 
                     // Chamada da função para carregar os usuários
-                    //that.onGetUsuarios(); Não precisa mais pois optei por carrega-los no carregamento do serviço via manifest
+                    that.onGetUsuarios();
                     that.getReadOpcoes();
                 });
             },
@@ -203,28 +207,35 @@ sap.ui.define([
                 });
             },
 
-            /*onGetUsuarios: function () {
+            onGetUsuarios: function () {
 
-                var that = this;
-                var strEntity = "/sap/opu/odata/sap/ZSB_USERS_13";
-                var oModelSend = new ODataModel(strEntity, true);
+                var oView = this.getView();
 
-                oModelSend.read("/Usuarios", {
-                    success: function (oData, results) {
-                        if (results.statusCode === 200) {
-                            var oModelUsers = new JSONModel();
-                            oModelUsers.setData(oData.results);
-                            that.getView().setModel(oModelUsers, "MDL_Users");
+                if(!oView.getModel("MDL_Users")){
+                    var strEntity = "/sap/opu/odata/sap/ZSB_USERS_13";
+                    var oModelSend = new ODataModel(strEntity, true);
+                    var bundle = oView.getModel("i18n").getResourceBundle();
+
+                    oModelSend.read("/Usuarios", {
+                        success: function (oData, results) {
+                            if (results.statusCode === 200) {
+                                
+                                var oModelUsers = new JSONModel();
+                                oModelUsers.setData(oData.results);
+                                oView.setModel(oModelUsers, "MDL_Users");
+
+                                oView.byId("selChangedby").insertItem(new ListItem({text: bundle.getText("selectSelecione")}), 0);
+                            }
+                        },
+                        error: function (e) {
+                            var oRet = JSON.parse(e.responde.body);
+                            MessageToast.show(oRet.error.message.value, {
+                                duration: 5000
+                            });
                         }
-                    },
-                    error: function (e) {
-                        var oRet = JSON.parse(e.responde.body);
-                        MessageToast.show(oRet.error.message.value, {
-                            duration: 5000
-                        });
-                    }
-                });
-            },*/
+                    });
+                }
+            },
 
             onValueHelpSearch: function (oEvent) {
                 var sValue = oEvent.getParameter("value");
@@ -326,7 +337,7 @@ sap.ui.define([
                 var bundle = this.getView().getModel("i18n").getResourceBundle();
                 var that = this;
 
-                // 4 - Criar o objeto model rederência do model default (ODataModel)
+                // 4 - Criar o objeto model referência do model default (ODataModel)
                 var oModelProduto = this.getView().getModel();
 
                 MessageBox.confirm(
@@ -343,6 +354,7 @@ sap.ui.define([
 
                             that._oBusyDialog.open();
 
+                            debugger;
                             var oModelSend = new ODataModel(oModelProduto.sServiceUrl, true);
                             oModelSend.create("Produtos", objNovo, null,
                                 function (d, r) {

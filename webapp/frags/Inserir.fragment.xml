@@ -108,24 +108,27 @@
                     <DatePicker valueStateText="{i18n>sfCreatedon}" id="inputData0" value="{ path: 'MDL_Produto>/Createdat', type : 'sap.ui.model.type.Date', formatOptions : { source: { pattern: 'dd/MM/yyyy' }, pattern: 'dd/MM/yyyy' }, constraints : { minimum : '01/01/2022' } }" required="true" width="65%" />
                     
                     <!-- Propriedade Criado por -->
-                    <!--
-					Deste modo estava buscando os dados via requisição no controller.
-					Coloquei pra buscar os dados via carregamento de serviço direto no manifest e recuperei na view no exemplo abaixo.
 
 					<Label id="lblCreatedby" text="{i18n>sfCreatedby}" required="true" />
-                    <Select id="selChangedby" width="65%" selectedKey="{MDL_Produto>/Usercreate}" items="{MDL_Users>/}">
+                    <Select id="selChangedby" width="65%" selectedKey="{
+							path: 'MDL_Produto>/Usercreate',
+							type: 'sap.ui.model.type.String',
+							constraints: {
+								minLength: 1
+							}
+						}" items="{MDL_Users>/}">
                         <items>
                             <core:ListItem id="_IDGenListItem5" key="{MDL_Users>Userid}" text="{MDL_Users>Firstname} {MDL_Users>Lastname}" />
                         </items>
-                    </Select>-->
+                    </Select>
 
 					<!-- Propriedade teste Criado por -->
-                    <Label id="teste" text="{i18n>sfCreatedby}" required="true" />
+                    <!--<Label id="teste" text="{i18n>sfCreatedby}" required="true" />
                     <Select id="selChangedbyteste" width="65%" selectedKey="{MDL_Produto>/Usercreate}" items="{path: 'Users>/Usuarios'}">
                         <items>
                             <core:ListItem id="_IDGenListItem5teste" key="{Users>Userid}" text="{Users>Firstname} {Users>Lastname}" />
                         </items>
-                    </Select>
+                    </Select>-->
                 </sap.ui.layout.form:content>
             </sap.ui.layout.form:SimpleForm>
             <sap.ui.layout.form:SimpleForm xmlns:sap.ui.layout.form="sap.ui.layout.form" minWidth="1024" maxContainerCols="2" editable="true" layout="ResponsiveGridLayout" labelSpanL="4" labelSpanM="4" emptySpanL="1" emptySpanM="1" columnsL="2" columnsM="2" id="form1364">
