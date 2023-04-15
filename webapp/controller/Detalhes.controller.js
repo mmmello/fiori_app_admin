@@ -11,12 +11,13 @@ sap.ui.define([
     "sap/ui/core/ValueState",
     "sap/ui/model/odata/ODataModel",
     "sap/m/MessageBox",
-    "sap/m/BusyDialog"
+    "sap/m/BusyDialog",
+    "sap/ui/core/UIComponent"
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, NumberFormat, Formatter, Fragment, JSONModel, MessageToast, Filter, FilterOperator, Validator, ValueState, ODataModel, MessageBox, BusyDialog) {
+    function (Controller, NumberFormat, Formatter, Fragment, JSONModel, MessageToast, Filter, FilterOperator, Validator, ValueState, ODataModel, MessageBox, BusyDialog, UIComponent) {
         "use strict";
 
         return Controller.extend("br.com.gestao.fioriappadmin.controller.Detalhes", {
@@ -81,6 +82,9 @@ sap.ui.define([
 
                 var oView = this.getView();
 
+                // Criar um parâmetro de controle para redirecionamento da view após o delete
+                this._bDelete = false;
+
                 // Criar a URL de chamada da nossa entidade de Produtos
                 var sURL = "/Produtos('" + oProduto + "')";
 
@@ -110,8 +114,12 @@ sap.ui.define([
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 
                 if (!oElementBinding.getBoundContext()) {
-                    oRouter.navTo("objNotFound");
-                    return;
+
+                    // Se não existe o registro e não estamos na operação de delete
+                    if (!this._bDelete) {
+                        oRouter.navTo("objNotFound");
+                        return;
+                    }
                 } else {
                     this._oProduto = Object.assign({}, oElementBinding.getBoundContext().getObject());
                 }
@@ -270,13 +278,13 @@ sap.ui.define([
                 var sPath = this.getView().getElementBinding().getPath();
 
                 //  2 - Manipulando propriedades
-                
+
                 objUpdate.Price = objUpdate.Price.toString();
                 objUpdate.Weightmeasure = objUpdate.Weightmeasure.toString();
                 objUpdate.Width = objUpdate.Width.toString();
                 objUpdate.Depth = objUpdate.Depth.toString();
                 objUpdate.Height = objUpdate.Height.toString();
-                objUpdate.Changedat = new Date().toISOString().substring(0,19);
+                objUpdate.Changedat = new Date().toISOString().substring(0, 19);
 
                 delete objUpdate.to_cat;
                 delete objUpdate.__metadata;
@@ -301,7 +309,7 @@ sap.ui.define([
                             });
 
                             that._oBusyDialog.open();
-                        
+
                             var oModelSend = new ODataModel(oModelProduto.sServiceUrl, true);
                             oModelSend.update(sPath, objUpdate, null,
                                 function (d, r) {
@@ -316,11 +324,11 @@ sap.ui.define([
                                         // Mensagem de sucesso na tela
                                         MessageBox.success(
                                             bundle.getText("updateDialogSuccess", [objUpdate.Productid]), {
-                                                onClose: function(sAction){
-                                                    // Atualizando a tela
-                                                    that.getView().getModel().refresh();
-                                                }
+                                            onClose: function (oAction) {
+                                                // Atualizando a tela
+                                                that.getView().getModel().refresh();
                                             }
+                                        }
                                         );
                                     }
                                 },
@@ -335,6 +343,68 @@ sap.ui.define([
                             );
                         }
                     }, bundle.getText("updateDialogTitle")
+                );
+            },
+
+            onDelete: function () {
+
+                //  1 - Criando referência do Model
+                var objDelete = this.getView().getElementBinding().getBoundContext().getObject();
+                var sPath = this.getView().getElementBinding().getPath();
+                var bundle = this.getView().getModel("i18n").getResourceBundle();
+                var that = this;
+                var oModelProduto = this.getView().getModel();
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+
+                MessageBox.confirm(
+                    bundle.getText("deleteDialogMsg", [objDelete.Productid]),
+                    function (oAction) {
+
+                        // Verificando se o usuário confirmou ou não a operação
+                        if (MessageBox.Action.OK === oAction) {
+
+                            // Criando um BusyDialog
+                            that._oBusyDialog = new BusyDialog({
+                                text: bundle.getText("Sending")
+                            });
+
+                            that._oBusyDialog.open();
+
+                            var oModelSend = new ODataModel(oModelProduto.sServiceUrl, true);
+                            oModelSend.remove(sPath, {
+                                success: function (d, r) {
+                                    if (r.statusCode === 204) {
+
+                                        // Fechando o BusyDialog
+                                        that._oBusyDialog.close();
+
+                                        // Setando parâmetro de delete
+                                        that._bDelete = true;
+
+                                        // Mensagem de sucesso na tela
+                                        MessageBox.success(
+                                            bundle.getText("deleteDialogSuccess", [objDelete.Productid]), {
+                                            actions: [MessageBox.Action.OK],
+                                            onClose: function (oAction) {
+                                                // Atualizando a tela
+                                                that.getView().getModel().refresh();
+                                                oRouter.navTo("lista");
+                                            }.bind(this)
+                                        }
+                                        );
+                                    }
+                                },
+                                error: function (e) {
+                                    // Fechando o BusyDialog
+                                    that._oBusyDialog.close();
+                                    var oRet = JSON.parse(e.responde.body);
+                                    MessageToast.show(oRet.error.message.value, {
+                                        duration: 5000
+                                    });
+                                }
+                            });
+                        }
+                    }, bundle.getText("deleteDialogTitle")
                 );
             }
         });
