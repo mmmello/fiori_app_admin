@@ -12,12 +12,13 @@ sap.ui.define([
     "sap/ui/model/odata/ODataModel",
     "sap/m/MessageBox",
     "sap/m/BusyDialog",
-    "sap/ui/core/UIComponent"
+    "sap/ui/core/UIComponent",
+    "sap/ui/core/routing/History"
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, NumberFormat, Formatter, Fragment, JSONModel, MessageToast, Filter, FilterOperator, Validator, ValueState, ODataModel, MessageBox, BusyDialog, UIComponent) {
+    function (Controller, NumberFormat, Formatter, Fragment, JSONModel, MessageToast, Filter, FilterOperator, Validator, ValueState, ODataModel, MessageBox, BusyDialog, UIComponent, History) {
         "use strict";
 
         return Controller.extend("br.com.gestao.fioriappadmin.controller.Detalhes", {
@@ -90,7 +91,7 @@ sap.ui.define([
 
                 oView.bindElement({
                     path: sURL,
-                    parameters: { expand: 'to_cat' },
+                    parameters: { expand: 'to_cat,to_users' },
 
                     events: {
                         change: this.onBindingChange.bind(this),
@@ -105,8 +106,6 @@ sap.ui.define([
             },
 
             onBindingChange: function (oEvent) {
-
-                debugger;
 
                 var oView = this.getView();
                 var oElementBinding = oView.getElementBinding();
@@ -287,6 +286,7 @@ sap.ui.define([
                 objUpdate.Changedat = new Date().toISOString().substring(0, 19);
 
                 delete objUpdate.to_cat;
+                delete objUpdate.to_users;
                 delete objUpdate.__metadata;
 
                 // 3 - Criando uma referência do arquivo i18n
@@ -321,15 +321,21 @@ sap.ui.define([
                                         // Voltar para somente leitura
                                         that.handleCancelPress();
 
+                                        // Atualizando o model
+                                        that.getView().getModel().refresh();
+
+                                        // Limpando o model de edição
+                                        that.getView().setModel(null, "MDL_Produto");
+
                                         // Mensagem de sucesso na tela
                                         MessageBox.success(
                                             bundle.getText("updateDialogSuccess", [objUpdate.Productid]), {
                                             onClose: function (oAction) {
                                                 // Atualizando a tela
-                                                that.getView().getModel().refresh();
-                                            }
-                                        }
-                                        );
+                                                var sPreviousHash = History.getInstance().getPreviousHash();
+                                                history.go(-1);
+                                            }.bind(this)
+                                        });
                                     }
                                 },
                                 function (e) {
@@ -390,8 +396,7 @@ sap.ui.define([
                                                 that.getView().getModel().refresh();
                                                 oRouter.navTo("lista");
                                             }.bind(this)
-                                        }
-                                        );
+                                        });
                                     }
                                 },
                                 error: function (e) {

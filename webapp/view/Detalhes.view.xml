@@ -97,22 +97,22 @@
                 <m:VBox id="_IDGenVBox6" class="sapUiSmallMarginEnd sapUiSmallMarginBotton">
                     <m:HBox id="ds68r">
                         <m:Label id="cas58da" text="{i18n>headerCreatedby}" class="sapUiSmallMarginEnd" />
-                        <m:Link id="linkHeadera" text="{UserName}" />
+                        <m:Label id="linkHeadera" text="{UserName}" />
                     </m:HBox>
                     <m:HBox id="dsd68">
                         <m:Label id="cas58sa" text="{i18n>headerCreatedon}" class="sapUiSmallMarginEnd" />
-                        <m:Link id="text7" text="{
+                        <m:Label id="text7" text="{
 								path: 'Createdat',
 								formatter: '.objFormatter.date'
 							}" />
                     </m:HBox>
                     <m:HBox id="ds68a">
                         <m:Label id="cas5a8a" text="{i18n>headerChangedby}" class="sapUiSmallMarginEnd" />
-                        <m:Link id="linkHeaddera" text="{Userupdate}" />
+                        <m:Label id="linkHeaddera" text="{to_users/Firstname} {to_users/Lastname}" />
                     </m:HBox>
                     <m:HBox id="ds68">
                         <m:Label id="cas58a" text="{i18n>headerChangedon}" class="sapUiSmallMarginEnd" />
-                        <m:Link  id="texst7" text="{
+                        <m:Label  id="texst7" text="{
 								path: 'Changedat',
 								formatter: '.objFormatter.date'
 							}" />

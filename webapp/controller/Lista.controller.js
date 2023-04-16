@@ -165,6 +165,10 @@ sap.ui.define([
                     // Chamada da função para carregar os usuários
                     that.onGetUsuarios();
                     that.getReadOpcoes();
+
+                    // Carrega data atual
+                    oView.getModel("MDL_Produto").getData().Createdat = new Date().toLocaleDateString();
+                    oView.getModel("MDL_Produto").refresh(true);
                 });
             },
 
@@ -329,7 +333,8 @@ sap.ui.define([
                 objNovo.Width = objNovo.Width.toString();
                 objNovo.Depth = objNovo.Depth.toString();
                 objNovo.Height = objNovo.Height.toString();
-                objNovo.Createdat = this.objFormatter.dateSAP(objNovo.Createdat);
+                var date = objNovo.Createdat;
+                objNovo.Createdat = (date.search("/") != -1) ? this.objFormatter.dateSAP(date) : date;
                 objNovo.Currencycode = "BRL";
                 objNovo.Userupdate = "";
 
@@ -354,11 +359,14 @@ sap.ui.define([
 
                             that._oBusyDialog.open();
 
-                            debugger;
                             var oModelSend = new ODataModel(oModelProduto.sServiceUrl, true);
                             oModelSend.create("Produtos", objNovo, null,
                                 function (d, r) {
                                     if (r.statusCode === 201) {
+                                        // Limpando os models
+                                        that.getView().setModel(null, "MDL_Produto");
+                                        that.getView().setModel(null, "MDL_Users");
+
                                         MessageToast.show(bundle.getText("insertDialogSuccess", [objNovo.Productid]), {
                                             duration: 5000
                                         });

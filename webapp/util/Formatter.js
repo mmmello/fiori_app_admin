@@ -107,8 +107,6 @@ sap.ui.define([
                     return value;
                 }
             }
-
-
         };
 
         return Formatter;

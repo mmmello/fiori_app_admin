@@ -12,12 +12,11 @@
 							path: 'MDL_Produto>/Name',
 							type: 'sap.ui.model.type.String',
 							constraints: {
-								minLength: 3,
-								search: '^[A-Za-z ]+$'
+								minLength: 3
 							}
 						}" />
                     <!-- Propriedade Description -->
-                    <Label id="lblDescr" text="{i18n>sfDescription}" />
+                    <Label id="lblDescr" text="{i18n>sfDescription}" required="true"/>
                     <TextArea id="textNote" width="65%" rows="4" maxLength="255" value="{
 							path: 'MDL_Produto>/Description',
 							type: 'sap.ui.model.type.String',
@@ -105,10 +104,9 @@
 
                     <!-- Propriedade Data Criacao -->
                     <Label id="lblDtCriacao" text="{i18n>sfCreatedon}" required="true" />
-                    <DatePicker valueStateText="{i18n>sfCreatedon}" id="inputData0" value="{ path: 'MDL_Produto>/Createdat', type : 'sap.ui.model.type.Date', formatOptions : { source: { pattern: 'dd/MM/yyyy' }, pattern: 'dd/MM/yyyy' }, constraints : { minimum : '01/01/2022' } }" required="true" width="65%" />
+                    <DatePicker valueStateText="{i18n>sfCreatedon}" enabled="false" id="dtPickerCreate" value="{ path: 'MDL_Produto>/Createdat', type : 'sap.ui.model.type.Date', formatOptions : { source: { pattern: 'dd/MM/yyyy' }, pattern: 'dd/MM/yyyy' }, constraints : { minimum : '01/01/2022' } }" required="true" width="65%" />
                     
                     <!-- Propriedade Criado por -->
-
 					<Label id="lblCreatedby" text="{i18n>sfCreatedby}" required="true" />
                     <Select id="selChangedby" width="65%" selectedKey="{
 							path: 'MDL_Produto>/Usercreate',
