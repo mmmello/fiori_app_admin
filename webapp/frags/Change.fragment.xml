@@ -14,8 +14,7 @@
 						path: 'MDL_Produto>/Name',
 						type: 'sap.ui.model.type.String',
 						constraints: {
-							minLength: 3,
-							search: '^[A-Za-z ]+$'
+							minLength: 3
 						}
 					}"
 				/>
